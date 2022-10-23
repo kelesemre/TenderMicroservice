@@ -5,7 +5,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using Product.API.Data;
+using Product.API.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +30,9 @@ namespace Product.API
         {
 
             services.AddControllers();
+            services.Configure<ProductDatabaseSettings>(Configuration.GetSection(nameof(ProductDatabaseSettings)));
+            services.AddSingleton<IProductDatabaseSettings>(p => p.GetRequiredService<IOptions<ProductDatabaseSettings>>().Value); // options pattern
+            services.AddTransient<IProductContext, ProductContext>();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Product.API", Version = "v1" });
